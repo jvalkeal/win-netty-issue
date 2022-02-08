@@ -9,6 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         version: [latest, dev, '22.0.0.2']
+        jdk: [11, 17]
         os: [windows-latest]
     steps:
       - uses: actions/checkout@v2
@@ -16,7 +17,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         with:
           version: ${{ matrix.version }}
-          java-version: '11'
+          java-version: ${{ matrix.jdk }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,10 +30,15 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          name: test-${{ matrix.os }}-${{ matrix.version }}
+          name: test-${{ matrix.os }}-${{ matrix.version }}-${{ matrix.jdk }}
           path: test*
 
       - name: Run Test.java on Windows
+        run: |
+          java Test
+        if: runner.os == 'Windows'
+
+      - name: Run test on Windows
         run: |
           ./test.exe
         if: runner.os == 'Windows'

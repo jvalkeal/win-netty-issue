@@ -13,6 +13,7 @@ public class Test {
 			System.out.println("hi2 " + ctx);
 		} catch (Exception e) {
 			System.err.print(e);
+			e.printStackTrace();
 		}
 	}
 }
