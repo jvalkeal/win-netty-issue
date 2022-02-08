@@ -6,9 +6,10 @@ jobs:
     name: ${{ matrix.version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         version: [latest, dev, '22.0.0.2']
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v2
 
@@ -19,22 +20,19 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and run Test.java
-        run: |
-          javac Test.java
-          native-image Test
-          ./Test
-        if: runner.os != 'Windows'
-
-      - name: Build and run Test.java on Windows
+      - name: Build Test.java on Windows
         run: |
           javac.exe Test.java
           native-image.cmd Test
-          ./Test.exe
         if: runner.os == 'Windows'
 
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          name: Test-${{ matrix.os }}-${{ matrix.version }}
-          path: Test*
+          name: test-${{ matrix.os }}-${{ matrix.version }}
+          path: test*
+
+      - name: Run Test.java on Windows
+        run: |
+          ./test.exe
+        if: runner.os == 'Windows'
